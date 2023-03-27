@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <time.h>
+#include <stdbool.h>
 
 
 unsigned int lfsr = 0xACE1u; // valor inicial del lfsr
@@ -14,31 +15,33 @@ int numero_aleatorio() {
     // se usa el modulo de 100 al lfrs ya que se ocupa un numero entre 00 y 99
     return (lfsr % 100);
 }
-//funcion que calcule un numero random y verifique si está en la memoria
-/*
+
+//funcion para ver si un numero está en los registros
+//funcion para agregar un numero en los registros
+//funcion para imprimir
 
 void guardar_imprimir(){
     bool a=true;
+    int n=0;
     while (a=true){
         n=numero_aleatorio();
-        a=func(); //funcion para ver si a está en los registros
+        //a=func(); //funcion para ver si a está en los registros
         if (a==false){
-            funcion_escribir_imprimir();
+            //funcion_escribir_imprimir();
         }
         else{
 
         }
     }
 
+}
 
 
 
-*/
 
 void main(void) {
     //int TRISIObits.TRISIO3 = 0b1;     // Se configura gp3 como entrada
     //int TRISIObits.TRISIO4 = 0b0;     // Se configura gp3 como entrada
-    //int OPTION_REGbits.nGPPU = 0b0;   // Enable internal pull-up resistors
     int i = 0;                  //Inicializa el contador de bolas
     int numero_bingo = 0;
     srand((unsigned) time(NULL));
@@ -60,18 +63,6 @@ void main(void) {
 
         //}
     }
-}
-/*
-    int rand_num;
-
-    // set the initial seed value based on current time
-    srand((unsigned) time(NULL));
-
-    // generate one random number between 00 to 99
-    rand_num = random_number();
-
-    // print the generated random number
-    printf("%02d\n", rand_num);
+};
 
 
-*/
