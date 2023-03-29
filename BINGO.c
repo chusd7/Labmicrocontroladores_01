@@ -2,7 +2,13 @@
 #include <stdio.h>
 #include <time.h>
 #include <stdbool.h>
+//#include <pic14/pic12f675.h>
+#include <pic14/pic12f683.h>
 //#include <xc.h>
+typedef unsigned int word;
+word __at 0x2007 __CONFIG = (_WDTE_OFF & _WDT_OFF & _MCLRE_OFF);  // WDT y MCLR OFF
+
+void delay (unsigned int tiempo);
 int bit0;
 int bit1;
 int bit2;
@@ -82,6 +88,7 @@ void main(void) {
     //int TRISIObits.TRISIO4 = 0b0;     // Se configura gp4 como salida
     int i = 0;                  //Inicializa el contador de bolas
     srand((unsigned) time(NULL));
+    GPIO = 0x00; //Poner pines en bajo
     //printf("num1 = %d, num2 = %d\n", n.Decen, n.Unid);
 
 
@@ -247,7 +254,7 @@ void main(void) {
                     bit7 = 1;
                     continue;
                 }
-                /*GP5 = ~GP5;
+                GP5 = ~GP5;
 
                 GP0 = bit0;
                 GP1 = bit1;
@@ -260,8 +267,7 @@ void main(void) {
                 GP0 = bit4;
                 GP1 = bit5;
                 GP2 = bit6;
-                GP4 = bit7;*/
-                printf("se acabo el bingo");
+                GP4 = bit7;
                 i++;
 
 
@@ -269,7 +275,7 @@ void main(void) {
             else{
                 //codigo para poner la pantalla parpadeando en 99,vaciar los registros
                 printf("se acabo el bingo");
-                i=20;
+                //i=20;
 
             }
 
