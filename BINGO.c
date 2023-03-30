@@ -3,7 +3,7 @@
 #include <time.h>
 #include <stdbool.h>
 //#include <pic14/pic12f675.h>
-#include <C:/Program Files/SDCC/include/pic14/pic12f683.h>
+#include </pic14/pic12f683.h>
 //#include <xc.h>
 typedef unsigned int word;
 word __at 0x2007 __CONFIG = (_WDTE_OFF & _WDT_OFF & _MCLRE_OFF);  // WDT y MCLR OFF
@@ -35,7 +35,7 @@ struct Numero_total* numero_aleatorio() {
 
     // se usa el modulo de 100 al lfrs ya que se ocupa un numero entre 00 y 99
     aux=lfsr % 100;
-    printf("num1 = %d",aux);
+    //printf("num1 = %d",aux);
     numero.Unid = aux % 10;
     numero.Decen = (aux / 10) % 10;
     return &numero;
@@ -44,8 +44,13 @@ struct Numero_total* numero_aleatorio() {
 
 
 void main(void) {
-    //int TRISIObits.TRISIO3 = 0b1;     // Se configura gp3 como entrada
-    //int TRISIObits.TRISIO4 = 0b0;     // Se configura gp4 como salida
+    TRISIO = 0b00001000 ; // Se configura gp3 como entrada
+    /*int TRISIObits.TRISIO2 = 0b0;     // Se configura gp4 como salida
+    int TRISIObits.TRISIO5 = 0b0;     // Se configura gp4 como salida
+    int TRISIObits.TRISIO6 = 0b0;     // Se configura gp4 como salida
+    int TRISIObits.TRISIO7 = 0b0;     // Se configura gp4 como salida
+    int TRISIObits.TRISIO3 = 0b1;     // Se configura gp3 como entrada
+    int TRISIObits.TRISIO4 = 0b0;     // Se configura gp4 como salida*/
     int i = 0;                  //Inicializa el contador de bolas
     srand((unsigned) time(NULL));
     GPIO = 0x00; //Poner pines en bajo
@@ -53,7 +58,7 @@ void main(void) {
 
 
     while(1) {
-        //if (GPIObits.GP3 == 0) {  // Check if GP3 is low (button pressed)
+        if (GPIObits.GP3 == 0) {  // Check if GP3 is low (button pressed)
             if(i<=16){
                 //codigo para verificar si el numero está dentro del registro
                 //usar una funcion para ver si el numero calculado está en el registro,salida booleana
@@ -233,14 +238,14 @@ void main(void) {
             }
             else{
                 //codigo para poner la pantalla parpadeando en 99,vaciar los registros
-                printf("se acabo el bingo");
+                //printf("se acabo el bingo");
                 //i=20;
 
             }
 
     }
-
-};
+    }
+}
 void delay(unsigned int tiempo)
 {
 	unsigned int i;
