@@ -3,9 +3,9 @@ MCU=-p12f683
 CC=sdcc
 LD=sdcc
 CFLAGS=-I. -I/usr/local/share/sdcc/non-free/include
-TARGET=bingo
+TARGET=BINGO
 
-SRCS = bingo.c
+SRCS = BINGO.c
 
 all:
 	${CC} --use-non-free ${FAMILY} ${MCU} ${CFLAGS} -o ${TARGET} ${SRCS}
