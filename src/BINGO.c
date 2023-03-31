@@ -1,33 +1,19 @@
 #include <stdlib.h>
 #include <stdio.h>
-//#include <pic14/pic12f675.h>
+//#include </usr/local/share/sdcc/non-free/includepic14/pic12f675.h>
 #include </usr/local/share/sdcc/non-free/include/pic14/pic12f683.h>
 //#include <xc.h>
-#define Boton GP3
-/*#define BCD_0 GP0
-#define BCD_1 GP1
-#define BCD_2 GP2
-#define BCD_3 GP5
-#define BCD_0 GP5
-#define BCD_1 GP2
-#define BCD_2 GP1
-#define BCD_3 GP0
-#define DISP_NEG GP4*/
+#define S3 GP0
+#define S2 GP1
+#define S1 GP2
+#define S0 GP4
+
 
 
 
 typedef unsigned int word;
 word __at 0x2007 __CONFIG = (_WDTE_OFF & _WDT_OFF & _MCLRE_OFF);  // WDT y MCLR OFF
 
-void delay (unsigned int tiempo);
-int bit0;
-int bit1;
-int bit2;
-int bit3;
-int bit4;
-int bit5;
-int bit6;
-int bit7;
 unsigned int lfsr = 0xACE1u; // valor inicial del lfsr
 
 struct Numero_total {
@@ -35,6 +21,33 @@ struct Numero_total {
   int Decen;
 };
 
+/************************FUNCIONES*************************/
+
+void delay(unsigned int tiempo)
+{
+	unsigned int i;
+	unsigned int j;
+
+	for(i=0;i<tiempo;i++)
+	  for(j=0;j<1275;j++);
+}
+
+//se inicializan los valores binarios del bcd
+const unsigned char SEGMENT_VALUES[10] = {
+    0b00111111, // 0
+    0b00000110, // 1
+    0b01011011, // 2
+    0b01001111, // 3
+    0b01100110, // 4
+    0b01101101, // 5
+    0b01111101, // 6
+    0b00000111, // 7
+    0b01111111, // 8
+    0b01101111  // 9
+};
+
+
+//Funcion que calcula un numero aleatorio con lfsr y returna un struct que contiene las unidades y decenas separadas
 struct Numero_total* numero_aleatorio() {
     struct Numero_total numero;
     int aux = 0 ;
@@ -53,219 +66,271 @@ struct Numero_total* numero_aleatorio() {
 }
 
 
+void display_numberd(int d) {
+
+    // Desplegar las decenas
+    S0 = ((SEGMENT_VALUES[d] >> 0) & 1);
+    S1 = ((SEGMENT_VALUES[d] >> 1) & 1);
+    S2 = ((SEGMENT_VALUES[d] >> 2) & 1);
+    S3 = ((SEGMENT_VALUES[d] >> 3) & 1);
+
+
+}
+void display_numberu(int u){
+
+    // Desplegar las decenas
+    S0 = ((SEGMENT_VALUES[u] >> 0) & 1);
+    S1 = ((SEGMENT_VALUES[u] >> 1) & 1);
+    S2 = ((SEGMENT_VALUES[u] >> 2) & 1);
+    S3 = ((SEGMENT_VALUES[u] >> 3) & 1);
+
+
+}
+void turn_off_display() {
+  // Set all segments to off
+  S0 = ((SEGMENT_VALUES[0] >> 0) & 1);
+  S1 = ((SEGMENT_VALUES[0] >> 1) & 1);
+  S2 = ((SEGMENT_VALUES[0] >> 2) & 1);
+  S3 = ((SEGMENT_VALUES[0] >> 3) & 1);
+  delay(1);
+  GP5 = ~GP5;
+  S0 = ((SEGMENT_VALUES[0] >> 0) & 1);
+  S1 = ((SEGMENT_VALUES[0] >> 1) & 1);
+  S2 = ((SEGMENT_VALUES[0] >> 2) & 1);
+  S3 = ((SEGMENT_VALUES[0] >> 3) & 1);
+  delay(1);
+  GP5 = ~GP5;
+
+}
 
 void main(void) {
     TRISIO = 0b00001000 ; // Se configura gp3 como entrada los demas como salidas
-    ANSEL = 0; //Todas las entradas se dejan como digitales
+    ANSEL = 0b00001000; // Set GP3 as digital input
     CMCON0 = 0x07; //Se apagan los comparadores
     GPIO = 0x00; //Inicializan todos los pines en 0 
-    /*int TRISIObits.TRISIO2 = 0b0;     // Se configura gp4 como salida
-    int TRISIObits.TRISIO5 = 0b0;     // Se configura gp4 como salida
-    int TRISIObits.TRISIO6 = 0b0;     // Se configura gp4 como salida
-    int TRISIObits.TRISIO7 = 0b0;     // Se configura gp4 como salida
-    int TRISIObits.TRISIO3 = 0b1;     // Se configura gp3 como entrada
-    int TRISIObits.TRISIO4 = 0b0;     // Se configura gp4 como salida*/
+    S0 = 0;
+    S1 = 0;
+    S2 = 0;
+    S3 = 0;
     int i = 0;                  //Inicializa el contador de bolas
-    //srand((unsigned) time(NULL));
-    //printf("num1 = %d, num2 = %d\n", n.Decen, n.Unid);
+    struct Numero_total* n;
+
+
 
 
     while(1) {
-        if (boton == 0) {  // Check if GP3 is low (button pressed)
+        if (i==0 && GP3==1){
+            n->Unid=0;
+            n->Decen=0;
+            display_numberu(n->Unid);
+            delay(10);
+            GP5 = ~GP5;
+            display_numberd(n->Decen);
+            delay(10);
+            GP5 = ~GP5; 
+        }
+        display_numberu(n->Unid);
+        delay(10);
+        GP5 = ~GP5;
+        display_numberd(n->Decen);
+        delay(10);
+        GP5 = ~GP5; 
+        
+        
+
+        if (GP3 == 0) {  // Check if GP3 is low (button pressed)
             if(i<=16){
-                //codigo para verificar si el numero está dentro del registro
-                //usar una funcion para ver si el numero calculado está en el registro,salida booleana
-                //guardar_imprimir();
-                struct Numero_total* n=numero_aleatorio();
-                if(n->Unid == 0){
-                    bit0 = 0;
-                    bit1 = 0;
-                    bit2 = 0;
-                    bit3 = 0;
-                    continue;
-                }
-
-                if(n->Unid == 1){
-                    bit0 = 1;
-                    bit1 = 0;
-                    bit2 = 0;
-                    bit3 = 0;
-                    continue;
-                }
-                if(n->Unid == 2){
-                    bit0 = 0;
-                    bit1 = 1;
-                    bit2 = 0;
-                    bit3 = 0;
-                    continue;
-                }
-                if(n->Unid == 3){
-                    bit0 = 1;
-                    bit1 = 1;
-                    bit2 = 0;
-                    bit3 = 0;
-                    continue;
-                }
-                if(n->Unid == 4)
-                {
-                    bit0 = 0;
-                    bit1 = 0;
-                    bit2 = 1;
-                    bit3 = 0;
-                    continue;
-                }
-                if(n->Unid == 5)
-                {
-                    bit0 = 1;
-                    bit1 = 0;
-                    bit2 = 1;
-                    bit3 = 0;
-                    continue;
-                }
-                if(n->Unid == 6)
-                {
-                    bit0 = 0;
-                    bit1 = 1;
-                    bit2 = 1;
-                    bit3 = 0;
-                    continue;
-                }
-
-                if (n->Unid == 7){
-                    bit0 = 1;
-                    bit1 = 1;
-                    bit2 = 1;
-                    bit3 = 0;
-                    continue;
-                }
-
-                if (n->Unid == 8){
-                    bit0 = 0;
-                    bit1 = 0;
-                    bit2 = 0;
-                    bit3 = 1;
-                    continue;
-                }
-
-                if (n->Unid == 9){
-                    bit0 = 1;
-                    bit1 = 0;
-                    bit2 = 0;
-                    bit3 = 1;
-                    continue;
-                }
-                if(n->Decen == 0){
-                    bit4 = 0;
-                    bit5 = 0;
-                    bit6 = 0;
-                    bit7 = 0;
-                    continue;
-                }
-
-                if(n->Decen == 1){
-                    bit4 = 1;
-                    bit5 = 0;
-                    bit6 = 0;
-                    bit7 = 0;
-                    continue;
-                }
-                if(n->Decen == 2){
-                    bit4 = 0;
-                    bit5 = 1;
-                    bit6 = 0;
-                    bit7 = 0;
-                    continue;
-                }
-                if(n->Decen == 3){
-                    bit4 = 1;
-                    bit5 = 1;
-                    bit6 = 0;
-                    bit7 = 0;
-                    continue;
-                }
-                if(n->Decen == 4)
-                {
-                    bit4 = 0;
-                    bit5 = 0;
-                    bit6 = 1;
-                    bit7 = 0;
-                    continue;
-                }
-                if(n->Decen == 5)
-                {
-                    bit4 = 1;
-                    bit5 = 0;
-                    bit6 = 1;
-                    bit7 = 0;
-                    continue;
-                }
-                if(n->Decen == 6)
-                {
-                    bit4 = 0;
-                    bit5 = 1;
-                    bit6 = 1;
-                    bit7 = 0;
-                    continue;
-                }
-
-                if (n->Decen == 7){
-                    bit4 = 1;
-                    bit5 = 1;
-                    bit6 = 1;
-                    bit7 = 0;
-                    continue;
-                }
-
-                if (n->Decen == 8){
-                    bit4 = 0;
-                    bit5 = 0;
-                    bit6 = 0;
-                    bit7 = 1;
-                    continue;
-                }
-
-                if (n->Decen == 9){
-                    bit4 = 1;
-                    bit5 = 0;
-                    bit6 = 0;
-                    bit7 = 1;
-                    continue;
-                }
-                GP5 = ~GP5;
-
-                GP0 = bit0;
-                GP1 = bit1;
-                GP2 = bit2;
-                GP4 = bit3;
-
-                delay(100);
-                GP5 = ~GP5;
-
-                GP0 = bit4;
-                GP1 = bit5;
-                GP2 = bit6;
-                GP4 = bit7;
+            //codigo para verificar si el numero estï¿½ dentro del registro
+            //usar una funcion para ver si el numero calculado estï¿½ en el registro,salida booleana
+            //guardar_imprimir();
+                n=numero_aleatorio();
                 i++;
-
-
             }
             else{
+                turn_off_display();
+                //GP5=1;
                 //codigo para poner la pantalla parpadeando en 99,vaciar los registros
-                //printf("se acabo el bingo");
                 //i=20;
 
             }
 
-    }
+        }
+        
     }
 }
-void delay(unsigned int tiempo)
-{
-	unsigned int i;
-	unsigned int j;
+            /*if(n->Unid == 0){
+                bit0 = 0;
+                bit1 = 0;
+                bit2 = 0;
+                bit3 = 0;
+                continue;
+            }
 
-	for(i=0;i<tiempo;i++)
-	  for(j=0;j<1275;j++);
-}
+            if(n->Unid == 1){
+                bit0 = 1;
+                bit1 = 0;
+                bit2 = 0;
+                bit3 = 0;
+                continue;
+            }
+            if(n->Unid == 2){
+                bit0 = 0;
+                bit1 = 1;
+                bit2 = 0;
+                bit3 = 0;
+                continue;
+            }
+            if(n->Unid == 3){
+                bit0 = 1;
+                bit1 = 1;
+                bit2 = 0;
+                bit3 = 0;
+                continue;
+            }
+            if(n->Unid == 4)
+            {
+                bit0 = 0;
+                bit1 = 0;
+                bit2 = 1;
+                bit3 = 0;
+                continue;
+            }
+            if(n->Unid == 5)
+            {
+                bit0 = 1;
+                bit1 = 0;
+                bit2 = 1;
+                bit3 = 0;
+                continue;
+            }
+            if(n->Unid == 6)
+            {
+                bit0 = 0;
+                bit1 = 1;
+                bit2 = 1;
+                bit3 = 0;
+                continue;
+            }
+
+            if (n->Unid == 7){
+                bit0 = 1;
+                bit1 = 1;
+                bit2 = 1;
+                bit3 = 0;
+                continue;
+            }
+
+            if (n->Unid == 8){
+                bit0 = 0;
+                bit1 = 0;
+                bit2 = 0;
+                bit3 = 1;
+                continue;
+            }
+
+            if (n->Unid == 9){
+                bit0 = 1;
+                bit1 = 0;
+                bit2 = 0;
+                bit3 = 1;
+                continue;
+            }
+            if(n->Decen == 0){
+                bit4 = 0;
+                bit5 = 0;
+                bit6 = 0;
+                bit7 = 0;
+                continue;
+            }
+
+            if(n->Decen == 1){
+                bit4 = 1;
+                bit5 = 0;
+                bit6 = 0;
+                bit7 = 0;
+                continue;
+            }
+            if(n->Decen == 2){
+                bit4 = 0;
+                bit5 = 1;
+                bit6 = 0;
+                bit7 = 0;
+                continue;
+            }
+            if(n->Decen == 3){
+                bit4 = 1;
+                bit5 = 1;
+                bit6 = 0;
+                bit7 = 0;
+                continue;
+            }
+            if(n->Decen == 4)
+            {
+                bit4 = 0;
+                bit5 = 0;
+                bit6 = 1;
+                bit7 = 0;
+                continue;
+            }
+            if(n->Decen == 5)
+            {
+                bit4 = 1;
+                bit5 = 0;
+                bit6 = 1;
+                bit7 = 0;
+                continue;
+            }
+            if(n->Decen == 6)
+            {
+                bit4 = 0;
+                bit5 = 1;
+                bit6 = 1;
+                bit7 = 0;
+                continue;
+            }
+
+            if (n->Decen == 7){
+                bit4 = 1;
+                bit5 = 1;
+                bit6 = 1;
+                bit7 = 0;
+                continue;
+            }
+
+            if (n->Decen == 8){
+                bit4 = 0;
+                bit5 = 0;
+                bit6 = 0;
+                bit7 = 1;
+                continue;
+            }
+
+            if (n->Decen == 9){
+                bit4 = 1;
+                bit5 = 0;
+                bit6 = 0;
+                bit7 = 1;
+                continue;
+            }
+            GP5 = ~GP5;
+
+            GP0 = bit0;
+            GP1 = bit1;
+            GP2 = bit2;
+            GP4 = bit3;
+
+            delay(100);
+            GP5 = ~GP5;
+
+            GP0 = bit4;
+            GP1 = bit5;
+            GP2 = bit6;
+            GP4 = bit7;
+            i++;*/
+
+
+
+
+
 
 

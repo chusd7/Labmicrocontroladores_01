@@ -1,7 +1,0 @@
-# depslib dependency file v1.0
-1679974743 source:c:\users\chus1\downloads\laboratorio de microcontroladores\laboratorios\laboratorio 1\bingo.c
-	<stdlib.h>
-	<stdio.h>
-	<time.h>
-	<stdbool.h>
-
